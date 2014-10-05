@@ -9,14 +9,20 @@ echo '1  -  update project'
 echo '2  -  build debug-apk'
 echo '3  -  build release-apk'
 echo '4  -  start logcat'
-echo '5  -  create new emulator'
-echo '6  -  launch emulator'
-echo '7  -  build & install'
-echo '8  -  build & install & logcat'
+echo '5  -  create AVD'
+echo '6  -  launch AVD'
+echo '7  -  build & install & run'
+echo '8  -  build & install & run & logcat'
 echo '9  -  install apk on emulator'
 echo '10 -  clean project'
 echo '11 -  install apk on device'
 echo '12 -  debug program' 
+echo '13 -  list AVD'
+echo '14 -  delete avd'
+echo '15 -  logcat by TAG name'
+echo '16 -  copy support v4 jar to libs'
+echo '17 -  run program'
+echo '18 -  build & install & run & logcat by TAG name'
 
 read -p 'input a option:' option
 echo 
@@ -24,12 +30,46 @@ echo
 # global data
 andr_scripts_path=~/repo/My_Shell_Scripts/andr_scripts/
 # utilities
-
+getProjectInfo () {
+	PACKAGE_NAME=$(ggrep -oP "(?<=package=\").*(?=\")" AndroidManifest.xml)
+	ACTIVITY=$(ggrep -oP "(?<=android:name=\").*(?=\".*android:label=\"@string/app_name)" AndroidManifest.xml)
+}
 # main menu functions
+
+launchProgram () {
+	getProjectInfo 
+	ACTIVITY=$PACKAGE_NAME$ACTIVITY				
+	LAUNCH_CMD="adb shell am start -e debug true -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n $PACKAGE_NAME/$ACTIVITY"
+	exec $LAUNCH_CMD &
+	
+}
+debugProgram () {
+	SOURCE_PATH=./src
+	DEBUG_PORT=8700
+	ACTIVITY=com.WRCA.android.MainActivity
+
+	#LAUNCH_CMD="adb shell am start -e debug true -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n $PACKAGE_NAME/$ACTIVITY"
+	#exec $LAUNCH_CMD &
+	#sleep 3 # wait for the app to start
+	APP_DEBUG_PORT=$(adb jdwp | tail -1);
+	adb forward tcp:$DEBUG_PORT jdwp:$APP_DEBUG_PORT
+	jdb -attach localhost:$DEBUG_PORT -sourcepath $SOURCE_PATH
+
+}
 cleanProject () {
 	ant clean
 }
 
+listAVD () {
+	echo '----------current exist AVD--------'
+	android list avd
+}
+deleteAVD () {
+ 	listAVD
+	echo	
+	read -p 'input name:' name
+	android delete avd -n $name
+}
 createProject () {
 	read -p "project name:" name
 	read -p "path:" path
@@ -121,17 +161,45 @@ buildDebugAPK () {
 buildReleaseAPK () {
 	ant releaase
 }
-startLogging () {
 
+startLogging () {
 	adb logcat -c
-	adb logcat -C
-#	adb logcat | grep $1
+
+	if [ "$1" == "" ]
+	then
+		adb logcat
+	elif [ "$1" == "V" ]
+	then
+		adb logcat '*:V'
+	elif [ "$1" == "D" ] 
+	then
+		adb logcat '*:D'
+	elif [ "$1" == "W" ] 
+	then
+		adb logcat '*:W'
+	elif [ "$1" == "E" ] 
+	then
+		adb logcat '*:E'
+	elif [ "$1" == "F" ] 
+	then
+		adb logcat '*:F'
+	else
+		adb logcat | grep "$1"
+	fi
 }
-createEmulator () {
-	android create avd -n 1 -t android-L -s QVGA -b x86
+
+createAVD () {
+	listAVD
+	echo
+	read -p 'input AVD name:' name
+	android create avd -n $name -t android-19 -s QVGA -b x86
+	android update avd -n $name 
 }
-launchEmulator () {
-	cmd="emulator -avd 1"
+launchAVD () {
+	listAVD
+	echo
+	read -p 'input AVD name:' name
+	cmd="emulator -avd $name"
 	$cmd& 
 }
 installAPK () {
@@ -165,19 +233,26 @@ case $option in
 		buildReleaseAPK
 		;;
 	4)
-		startLogging
+		startLogging 
 		;;
 	5)
-		createEmulator
+		createAVD
 		;;
 	6)
-		launchEmulator
+		launchAVD
 		;;
 	7)
-		buildAndInstall
+		buildDebugAPK
+		installAPK emulator
+		launchProgram
+
 		;;
 	8)
-		BuildAndInstallAndLogcat
+		# Build and Install and Run and Logcat
+		buildDebugAPK
+		installAPK emulator
+		launchProgram
+		startLogging E
 		;;
 	9)
 		installAPK emulator
@@ -187,6 +262,33 @@ case $option in
 		;;
 	11)
 		installAPK device
+		;;
+	12)
+		debugProgram
+		;;
+	13)
+		listAVD
+		;;
+	14)
+		deleteAVD
+		;;
+	15)
+		read -p 'input TAG name:' TAG
+		startLogging $TAG 
+		;;
+	16)
+		cp /opt/tools/android-sdk-macosx/extras/android/support/v4/*.jar ./libs
+		;;
+	17)
+		launchProgram
+		;;
+	18)
+		# Build and Install and Run and Logcat
+		buildDebugAPK
+		installAPK emulator
+		read -p 'input TAG name:' TAG
+		launchProgram
+		startLogging $TAG
 		;;
 	*)
 		echo 'please enter a valid option!'
