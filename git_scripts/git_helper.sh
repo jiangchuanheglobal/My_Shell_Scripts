@@ -61,6 +61,7 @@ gitCommit () {
 }
 gitPush () {
 	local curBranch=$(git rev-parse --abbrev-ref HEAD)
+	echo '-----push to remote $curBranch branch-----'
 	git push origin $curBranch	
 }
 gitAddbranch () {
