@@ -2,6 +2,9 @@
 # for reconvery, use git reset --hard 
 #
 
+#----------------------------------
+# git pull origin
+#----------------------------------
 echo '-------------------------------'
 echo '    git easy handling tool     '
 echo '-------------------------------'

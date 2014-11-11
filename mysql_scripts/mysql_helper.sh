@@ -4,6 +4,10 @@
 # USE GeoHelper;
 # create table
 
+#---------------------------------------------
+# mysql -h host -u user -p pass --execute CMD
+#
+#---------------------------------------------
 statement=""
 CREATE_TABLE_FILE=_table.txt
 
@@ -15,7 +19,7 @@ executeSQL () {
 		exit
 	fi
 
-	sudo mysql --execute="$1"
+	mysql -u root --execute "$1"
 }
 printUsage (){
 	echo '----------------------------'

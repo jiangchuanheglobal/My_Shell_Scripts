@@ -20,9 +20,11 @@ echo '12 -  debug program'
 echo '13 -  list AVD'
 echo '14 -  delete avd'
 echo '15 -  logcat by TAG name'
-echo '16 -  copy public libs to currrent project'
+echo '16 -  copy libs to currrent project'
 echo '17 -  run program'
 echo '18 -  build & install & run & logcat by TAG name'
+echo '19 -  update project.properties file'
+echo '20 -  update subproject'
 
 read -p 'input a option:' option
 echo 
@@ -31,15 +33,41 @@ echo
 andr_scripts_path=~/repo/My_Shell_Scripts/andr_scripts/
 # utilities
 
+updateSubproject () {
+	echo 'update actionbarsherlock subproj'
+	path=./libs/ActionBarSherlock/actionbarsherlock/
+	android update project -p "$path"
+}
+
+updateProjectProperties () {
+	# project.properties full name
+	path=./project.properties
+	SL=android.library.reference.1=libs/ActionbarSherlock/actionbarsherlock	
+	echo 'append sherlock reference'
+	echo $SL >> "$path"
+}
 copyLibs () {
 	echo '--------utitlity for copying library to current project---------'
 	echo 'list of exist libraries:'
-	path=~/repo/My_Android/public_libs
+	
+	# src libs path
+	path=~/repo/My_Android/libs
 	ls $path
 	echo
 	read -p 'input library name:' lib
-	cp $path/$lib ./libs	
-#	cp /opt/tools/android-sdk-macosx/extras/android/support/v4/*.jar ./libs
+
+	while [ "$lib" != "" ]
+	do
+		if [ -d $path/$lib ]
+		then
+			echo 'copy dir'
+			cp -r $path/$lib ./libs	
+		else
+			echo 'copy jar'
+			cp $path/$lib ./libs	
+		fi
+		read -p 'input library name:' lib
+	done
 }
 getProjectInfo () {
 	PACKAGE_NAME=$(ggrep -oP "(?<=package=\").*(?=\")" AndroidManifest.xml)
@@ -310,6 +338,12 @@ case $option in
 		read -p 'input TAG name:' TAG
 		launchProgram
 		startLogging $TAG
+		;;
+	19)
+		updateProjectProperties
+		;;
+	20)
+		updateSubproject
 		;;
 	*)
 		echo 'please enter a valid option!'
