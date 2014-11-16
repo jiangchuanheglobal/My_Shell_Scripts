@@ -1,0 +1,12 @@
+mycd.sh
+---------
+if user_input_string not match file/folder in current dir
+		result = use regexp match on user_input_string to do further matching in current dir
+		if result == true
+				do local jump
+		else 
+				result = find in history using regexp
+				if result == true
+						do global jump
+				else
+						echo "error"

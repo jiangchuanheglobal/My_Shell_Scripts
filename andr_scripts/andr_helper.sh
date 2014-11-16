@@ -1,3 +1,4 @@
+#! /usr/local/bin/bash
 echo '-----------------------------------'
 echo 'android auto build and testing tool'
 echo '             using android & ant'
@@ -71,11 +72,15 @@ copyLibs () {
 }
 getProjectInfo () {
 	PACKAGE_NAME=$(ggrep -oP "(?<=package=\").*(?=\")" AndroidManifest.xml)
-	ACTIVITY=$(ggrep -oP "(?<=android:name=\").*(?=\".*android:label=\"@string/app_name)" AndroidManifest.xml)
+	#ACTIVITY=$(ggrep -oP "(?<=android:name=\").*(?=\".*android:label=\"@string/app_name)" AndroidManifest.xml)
+
+	local str="$(sed -e '/<activity/,/MAIN/!d' AndroidManifest.xml)"
+	ACTIVITY="$(echo "$str" | ggrep -oP "(?<=<activity android:name=\").*(?=\")")"
 
 	echo '-------------project info------------'
 	echo "package name:$PACKAGE_NAME"
-	echo "activity name:$ACTIVITY"
+	echo "launch activity name:$ACTIVITY"
+	echo
 	echo
 }
 # main menu functions
@@ -87,7 +92,8 @@ launchProgram () {
 		echo 'get activity name failed! abort running!'
 		exit 0
 	fi
-	ACTIVITY=$PACKAGE_NAME$ACTIVITY				
+	#TODO: check dot prefix exist or not
+	ACTIVITY="."$ACTIVITY
 	LAUNCH_CMD="adb shell am start -e debug true -a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n $PACKAGE_NAME/$ACTIVITY"
 	exec $LAUNCH_CMD &
 	

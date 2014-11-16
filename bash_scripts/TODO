@@ -1,0 +1,63 @@
+bash commands quick reference design guide
+-------------------------------------------
+
+an interactive bash script syntax, commands, tricks quick reference tool
+
+design
+-------
+
+tree structure
+basic element, echo statement
+
+-basic syntax
+
+### variable
+### control structures
+loops
+conditionals
+
+### arrays
+function
+statements & expressions
+
+### operators
+number
+string
+file
+
+
+strings
+--------------------
+insert
+delete
+
+-length
+echo "${#var}"
+
+substring
+concatenate
+Single quotes
+
+I/O
+--------------------
+
+
+commands
+--------------------
+### input/output
+echo
+printf
+read
+
+### file
+ls
+cat
+wc
+
+sed
+grep
+awk
+
+### string
+
+

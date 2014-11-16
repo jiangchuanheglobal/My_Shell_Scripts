@@ -1,0 +1,21 @@
+remove_helper.sh
+----------------
+
+the system rm command substitution
+
+features
+---------------
+implement rm most common parameters, which are listed below
+1. -i request confirmation
+2. -R recursively
+3. -v verbose
+4. -f force
+5. -d directories and other types of files
+
+auto detect file or dir
+
+usage
+-----------
+remove [-iv] file/dir/*.extension
+
+

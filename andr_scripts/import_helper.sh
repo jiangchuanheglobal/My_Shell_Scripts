@@ -38,18 +38,14 @@ declare -A allLib
 
 # load already import lib info
 
-#echo "${hashandrLib["k"]}"
-#for key in ${!hashandrLib[@]}; do something; done
-#for value in ${hashandrLib[@]}; do something; done
-#echo hashandrLib has ${#hashandrLib[@]} elements
-
-
 # split line
 
 # preprocess
 str="$(cat "$1")"
 str="$(echo "$str" | tr '*' " ")"
 str="$(echo $str | tr '/' " ")"
+str="$(echo $str | tr '<' " ")"
+str="$(echo $str | tr '>' " ")"
 #read -A a <<< "$str"
 
 oldIFS="$IFS"

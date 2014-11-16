@@ -59,7 +59,7 @@ case $option in
 		update_project		
 		;;
 	2)
-		ant build
+		ant compile
 		;;
 	3)
 		ant run

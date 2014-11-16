@@ -7,3 +7,7 @@
 4. auto inject "import lib..."
 
 5. permission check script
+
+6. check Androidmanifest.xml min, target version before updating project!
+
+sed -e '/<activity/,/MAIN/!d' AndroidManifest.xml
